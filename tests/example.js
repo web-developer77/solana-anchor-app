@@ -10,55 +10,46 @@ describe("example", () => {
   anchor.setProvider(provider);
 
     // The Account to create.
-    const myAccount = anchor.web3.Keypair.generate();
-
-  it("Creates and initializes an account in a single atomic transaction (simplified)", async () => {
-    // #region code-simplified
-    // The program to execute.
+    const counter = anchor.web3.Keypair.generate();
     const program = anchor.workspace.Example;
 
-
-    // Create the new account and initialize it with the program.
+  it("Creates a counter", async () => {
     // #region code-simplified
-    await program.rpc.initialize(new anchor.BN(1234), {
+    // The program to execute.
+    
+    await program.rpc.create(provider.wallet.publicKey, {
       accounts: {
-        myAccount: myAccount.publicKey,
+        counter: counter.publicKey,
         user: provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       },
-      signers: [myAccount],
+      signers: [counter],
     });
     // #endregion code-simplified
 
     // Fetch the newly created account from the cluster.
-    const account = await program.account.myAccount.fetch(myAccount.publicKey);
+    let counterAccount = await program.account.counter.fetch(counter.publicKey);
 
     // Check it's state was initialized.
-    assert.ok(account.data.eq(new anchor.BN(1234)));
+    assert.ok(counterAccount.authority.equals(provider.wallet.publicKey));
+    assert.ok(counterAccount.count.toNumber() === 0)
 
     // Store the account for the next test.
   });
 
-  it("Updates a previously created account", async () => {
+  it("Update a counter", async () => {
 
-    // #region update-test
-
-    // The program to execute.
-    const program = anchor.workspace.Example;
-
-    // Invoke the update rpc.
-    await program.rpc.update(new anchor.BN(4321), {
+    await program.rpc.increment({
       accounts: {
-        myAccount: myAccount.publicKey,
+        counter: counter.publicKey,
+        authority: provider.wallet.publicKey,
       },
     });
 
     // Fetch the newly updated account.
-    const account = await program.account.myAccount.fetch(myAccount.publicKey);
+    const counterAccount = await program.account.counter.fetch(counter.publicKey);
 
-    // Check it's state was mutated.
-    assert.ok(account.data.eq(new anchor.BN(4321)));
-
-    // #endregion update-test
+    assert.ok(counterAccount.authority.equals(provider.wallet.publicKey))
+    assert.ok(counterAccount.count.toNumber() == 1)
   });
 });

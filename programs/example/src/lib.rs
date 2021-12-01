@@ -37,6 +37,7 @@ pub struct Increment<'info> {
 }
 
 #[account]
-pub struct MyAccount {
-    pub data: u64,
+pub struct Counter {
+    pub authority: Pubkey,
+    pub count: u64,
 }
