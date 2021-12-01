@@ -9,47 +9,29 @@ describe("example", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(provider);
 
-    // The Account to create.
-    const counter = anchor.web3.Keypair.generate();
-    const program = anchor.workspace.Example;
+  it("Performs CPI from puppet master to puppet", async () => {
+    const puppetMaster = anchor.workspace.PuppetMaster;    
+    const puppet = anchor.workspace.Puppet;
 
-  it("Creates a counter", async () => {
-    // #region code-simplified
-    // The program to execute.
-    
-    await program.rpc.create(provider.wallet.publicKey, {
+    const newPuppetAccount = anchor.web3.Keypair.generate();
+    const tx = await puppet.rpc.initialize({
       accounts: {
-        counter: counter.publicKey,
+        puppet: newPuppetAccount.publicKey,
         user: provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       },
-      signers: [counter],
+      signers: [newPuppetAccount],
     });
-    // #endregion code-simplified
 
-    // Fetch the newly created account from the cluster.
-    let counterAccount = await program.account.counter.fetch(counter.publicKey);
-
-    // Check it's state was initialized.
-    assert.ok(counterAccount.authority.equals(provider.wallet.publicKey));
-    assert.ok(counterAccount.count.toNumber() === 0)
-
-    // Store the account for the next test.
-  });
-
-  it("Update a counter", async () => {
-
-    await program.rpc.increment({
+    await puppetMaster.rpc.pullStrings(new anchor.BN(777), {
       accounts: {
-        counter: counter.publicKey,
-        authority: provider.wallet.publicKey,
+        puppet: newPuppetAccount.publicKey,
+        puppetProgram: puppet.programId,
       },
     });
 
-    // Fetch the newly updated account.
-    const counterAccount = await program.account.counter.fetch(counter.publicKey);
+    const puppetAccount = await puppet.account.data.fetch(newPuppetAccount.publicKey);
+    assert.ok(puppetAccount.data.eq(new anchor.BN(777)));
 
-    assert.ok(counterAccount.authority.equals(provider.wallet.publicKey))
-    assert.ok(counterAccount.count.toNumber() == 1)
   });
 });
