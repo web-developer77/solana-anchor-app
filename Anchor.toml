@@ -1,6 +1,5 @@
 [programs.localnet]
-puppet = "5CwWqg5XNbDBz8gJbynMnx3i2FWg9unZids789gUuvtY"
-puppet_master = "3PBynYnRPjzWGpYprA21oK8cbHbHwGij67Qm5hswic4f"
+example="HmZ5eqwP6CT6XUSFq2J39o4jfRJk91rHPSKnZqzBFsLx"
 [registry]
 url = "https://anchor.projectserum.com"
 

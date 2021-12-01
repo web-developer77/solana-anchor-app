@@ -1,37 +1,20 @@
 use anchor_lang::prelude::*;
 
-declare_id!("5CwWqg5XNbDBz8gJbynMnx3i2FWg9unZids789gUuvtY");
+declare_id!("HmZ5eqwP6CT6XUSFq2J39o4jfRJk91rHPSKnZqzBFsLx");
 
 #[program]
-pub mod puppet {
+pub mod error {
     use super::*;
-    pub fn initialize(_ctx: Context<Initialize>) -> ProgramResult {
-        Ok(())
-    }
-
-    pub fn set_data(ctx: Context<SetData>, data: u64) -> ProgramResult {
-        let puppet = &mut ctx.accounts.puppet;
-        puppet.data = data;
-        Ok(())
+    pub fn hello(_ctx: Context<Hello>) -> Result<()> {
+        Err(ErrorCode::Hello.into())
     }
 }
 
 #[derive(Accounts)]
-pub struct Initialize<'info> {
-    #[account(init, payer = user, space = 8 + 8)]
-    pub puppet: Account<'info, Data>,
-    #[account(mut)]
-    pub user: Signer<'info>,
-    pub system_program: Program<'info, System>,
-}
+pub struct Hello {}
 
-#[derive(Accounts)]
-pub struct SetData<'info> {
-    #[account(mut)]
-    pub puppet: Account<'info, Data>,
-}
-
-#[account]
-pub struct Data {
-    pub data: u64,
+#[error]
+pub enum ErrorCode {
+    #[msg("This is an error message clients will automatically display")]
+    Hello,
 }

@@ -430,6 +430,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "error"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+]
+
+[[package]]
 name = "feature-probe"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -692,21 +699,6 @@ dependencies = [
  "syn",
  "version_check",
  "yansi",
-]
-
-[[package]]
-name = "puppet"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
-]
-
-[[package]]
-name = "puppet-master"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "puppet",
 ]
 
 [[package]]
